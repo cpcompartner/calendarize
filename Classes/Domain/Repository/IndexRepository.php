@@ -512,7 +512,7 @@ class IndexRepository extends AbstractRepository
      */
     protected function getStoragePageIds(): array
     {
-        if (null !== $this->overridePageIds) {
+        if (!empty($this->overridePageIds)) {
             return $this->overridePageIds;
         }
 
