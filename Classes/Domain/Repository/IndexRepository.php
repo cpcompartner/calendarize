@@ -520,7 +520,23 @@ class IndexRepository extends AbstractRepository
         $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
         $frameworkConfig = $configurationManager
             ->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
-        return isset($frameworkConfig['persistence']['storagePid']) ?
+
+        $raw = $frameworkConfig['persistence']['storagePid'] ?? null;
+
+        $storagePidSet = false;
+        if (is_string($raw)) {
+            // Split by comma, trim spaces, filter positive integers
+            $pids = array_filter(array_map('trim', explode(',', $raw)), function ($v) {
+                return $v !== '' && ctype_digit($v) && (int)$v > 0;
+            });
+            $storagePidSet = !empty($pids);
+        } elseif (is_int($raw)) {
+            $storagePidSet = $raw > 0;
+        } elseif (is_numeric($raw)) { // covers numeric strings not using commas
+            $storagePidSet = (int)$raw > 0;
+        }
+
+        return $storagePidSet ?
             GeneralUtility::intExplode(',', $frameworkConfig['persistence']['storagePid']) :
             [];
     }
