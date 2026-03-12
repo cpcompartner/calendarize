@@ -223,6 +223,15 @@ class IndexRepository extends AbstractRepository
                     ];
                 }
             }
+
+            // QUICK FIX: remove index ids if custom startingPoints are set
+            // which results in translated records being displayed properly
+            // @TODO needs to be refactored in the near future
+            if ($customSearch['startingPoints']) {
+                unset($tabledIndexIds);
+                unset($indexIds);
+            }
+
             $foreignIdConstraints = [];
             // Old way, just accept foreignUids as provided, not checking the table.
             // This has a caveat solved with the $tabledIndexIds
